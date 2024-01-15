@@ -17,6 +17,7 @@ import { CardWrapper } from '@/components/auth/CardWrapper';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/FormError';
 import { FormSuccess } from '@/components/FormSuccess';
+import { register } from '@/actions/register';
 
 export const RegisterForm = () => {
   const [error, setError] = useState<string | undefined>('');
@@ -26,9 +27,9 @@ export const RegisterForm = () => {
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      name: '',
+      email: 'metindir@gmail.com',
+      password: '123456',
+      name: 'Metin',
     },
   });
 
@@ -36,7 +37,12 @@ export const RegisterForm = () => {
     setError('');
     setSuccess('');
 
-    startTransition(() => {});
+    startTransition(() => {
+      register(values).then((data) => {
+        setError(data.error);
+        setSuccess(data.success);
+      });
+    });
   };
 
   return (

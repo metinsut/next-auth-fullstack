@@ -19,6 +19,7 @@ import { CardWrapper } from '@/components/auth/CardWrapper';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/FormError';
 import { FormSuccess } from '@/components/FormSuccess';
+import { login } from '@/actions/login';
 // import { login } from '@/actions/login';
 
 export const LoginForm = () => {
@@ -47,21 +48,21 @@ export const LoginForm = () => {
     setSuccess('');
 
     startTransition(() => {
-      // login(values, callbackUrl)
-      //   .then((data) => {
-      //     if (data?.error) {
-      //       form.reset();
-      //       setError(data.error);
-      //     }
-      //     if (data?.success) {
-      //       form.reset();
-      //       setSuccess(data.success);
-      //     }
-      //     if (data?.twoFactor) {
-      //       setShowTwoFactor(true);
-      //     }
-      //   })
-      //   .catch(() => setError('Something went wrong'));
+      login(values, callbackUrl)
+        .then((data) => {
+          if (data?.error) {
+            form.reset();
+            setError(data.error);
+          }
+          if (data?.success) {
+            form.reset();
+            setSuccess(data.success);
+          }
+          // if (data?.twoFactor) {
+          //   setShowTwoFactor(true);
+          // }
+        })
+        .catch(() => setError('Something went wrong'));
     });
   };
 
