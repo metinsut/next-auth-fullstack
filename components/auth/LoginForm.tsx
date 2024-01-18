@@ -20,7 +20,6 @@ import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/FormError';
 import { FormSuccess } from '@/components/FormSuccess';
 import { login } from '@/actions/login';
-// import { login } from '@/actions/login';
 
 export const LoginForm = () => {
   const searchParams = useSearchParams();
