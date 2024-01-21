@@ -5,6 +5,7 @@ import authConfig from '@/auth.config';
 import { getUserById } from './data/user';
 import { UserRole } from '@prisma/client';
 import { getAccountByUserId } from './actions/account';
+import { db } from './lib/db';
 
 const prisma = new PrismaClient();
 
@@ -14,6 +15,14 @@ export const {
   signIn,
   signOut,
 } = NextAuth({
+  events: {
+    async linkAccount({ user }) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { emailVerified: new Date() },
+      });
+    },
+  },
   callbacks: {
     async session({ token, session }) {
       console.log('session', session);
