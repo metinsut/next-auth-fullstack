@@ -2,6 +2,7 @@
 
 import { signIn } from '@/auth';
 import { getUserByEmail } from '@/data/user';
+import { sendVerificationEmail } from '@/lib/mail';
 import { generateVerificationToken } from '@/lib/tokens';
 import { DEFAULT_LOGIN_REDIRECT } from '@/routes';
 import { LoginSchema } from '@/schemas';
@@ -31,11 +32,11 @@ export const login = async (
       existingUser.email
     );
 
-    /*     await sendVerificationEmail(
+    await sendVerificationEmail(
       verificationToken.email,
       verificationToken.token
     );
- */
+
     return { success: 'Confirmation email sent!' };
   }
 

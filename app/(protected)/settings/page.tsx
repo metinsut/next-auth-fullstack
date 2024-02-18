@@ -3,14 +3,10 @@ import { Button } from '@/components/ui/button';
 
 export default async function Page() {
   const session = await auth();
-  const handleSignOut = async () => {
-    'use server';
-    await signOut();
-  };
+
   return (
     <div>
       {JSON.stringify(session)}
-      <Button onClick={handleSignOut}>SignOut</Button>
       <form
         action={async () => {
           'use server';
@@ -18,7 +14,7 @@ export default async function Page() {
         }}
       >
         {' '}
-        <button>Sign Out</button>
+        <Button>Sign Out</Button>
       </form>
     </div>
   );
