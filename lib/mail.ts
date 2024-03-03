@@ -15,7 +15,7 @@ export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
   const resetLink = `${domain}/auth/new-password?token=${token}`;
-  const { data, error } = await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: 'Acme <onboarding@resend.dev>',
     to: [email],
     subject: 'Reset your password',

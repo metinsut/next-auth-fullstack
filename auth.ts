@@ -1,19 +1,19 @@
 import NextAuth from 'next-auth';
-import { PrismaAdapter } from '@auth/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
-import authConfig from '@/auth.config';
-import { getUserById } from './data/user';
 import { UserRole } from '@prisma/client';
-import { getAccountByUserId } from './actions/account';
-import { db } from './lib/db';
+import { PrismaAdapter } from '@auth/prisma-adapter';
 
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
+import authConfig from '@/auth.config';
+import { getUserById } from '@/data/user';
+import { getTwoFactorConfirmationByUserId } from '@/data/two-factor-confirmation';
+import { getAccountByUserId } from './data/account';
 
 export const {
   handlers: { GET, POST },
   auth,
   signIn,
   signOut,
+  update,
 } = NextAuth({
   pages: {
     signIn: '/auth/login',
@@ -37,16 +37,18 @@ export const {
       // Prevent sign in without email verification
       if (!existingUser?.emailVerified) return false;
 
-      // if (existingUser.isTwoFactorEnabled) {
-      //   const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(existingUser.id);
+      if (existingUser.isTwoFactorEnabled) {
+        const twoFactorConfirmation = await getTwoFactorConfirmationByUserId(
+          existingUser.id
+        );
 
-      //   if (!twoFactorConfirmation) return false;
+        if (!twoFactorConfirmation) return false;
 
-      //   // Delete two factor confirmation for next sign in
-      //   await db.twoFactorConfirmation.delete({
-      //     where: { id: twoFactorConfirmation.id }
-      //   });
-      // }
+        // Delete two factor confirmation for next sign in
+        await db.twoFactorConfirmation.delete({
+          where: { id: twoFactorConfirmation.id },
+        });
+      }
 
       return true;
     },
@@ -60,8 +62,13 @@ export const {
       }
 
       if (session.user) {
+        session.user.isTwoFactorEnabled = token.isTwoFactorEnabled as boolean;
+      }
+
+      if (session.user) {
         session.user.name = token.name;
         session.user.email = token.email;
+        session.user.isOAuth = token.isOAuth as boolean;
       }
 
       return session;
@@ -79,12 +86,12 @@ export const {
       token.name = existingUser.name;
       token.email = existingUser.email;
       token.role = existingUser.role;
-      // token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
+      token.isTwoFactorEnabled = existingUser.isTwoFactorEnabled;
 
       return token;
     },
   },
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(db),
   session: { strategy: 'jwt' },
   ...authConfig,
 });
